@@ -1,8 +1,14 @@
 import fuzzy from 'fuzzy'
 import inquirer from 'inquirer'
 import inquirerPrompt from 'inquirer-autocomplete-prompt'
-import { readdirSync } from 'node:fs'
-import { dirname } from 'node:path'
+import {
+  mkdirSync,
+  readdirSync,
+  readFileSync,
+  statSync,
+  writeFileSync,
+} from 'node:fs'
+import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
@@ -32,5 +38,38 @@ const questions = [
 ]
 
 inquirer.prompt(questions).then((answers) => {
-  console.log(answers)
+  const projectChoice = answers['project-choice']
+  const projectName = answers['project-name']
+  const templatePath = join(__dirname, 'templates', projectChoice)
+  const newProjectPath = join(currDir, projectName)
+
+  try {
+    mkdirSync(newProjectPath)
+    createDirectoryContents(templatePath, newProjectPath)
+  } catch (err) {
+    console.log(err.message)
+  }
 })
+
+function createDirectoryContents(src, dest) {
+  const filesToCreate = readdirSync(src)
+
+  for (const fileOrDir of filesToCreate) {
+    const origPath = join(src, fileOrDir)
+    const newPath = join(dest, fileOrDir)
+    const stats = statSync(origPath)
+
+    if (stats.isFile()) {
+      const contents = readFileSync(origPath, 'utf8')
+      writeFileSync(newPath, contents)
+    } else if (stats.isDirectory()) {
+      try {
+        mkdirSync(newPath)
+        // recusrive call
+        createDirectoryContents(origPath, newPath)
+      } catch (err) {
+        console.log(err.message)
+      }
+    }
+  }
+}
