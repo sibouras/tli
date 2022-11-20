@@ -17,7 +17,7 @@ const questions = [
   {
     type: 'autocomplete',
     name: 'project-choice',
-    message: 'What project template would you like to generate?',
+    message: 'Select a template:',
     source: (_answers, input = '') =>
       fuzzy.filter(input, choices).map((el) => el.original),
   },
@@ -41,7 +41,10 @@ const newProjectPath = join(currDir, projectName)
 
 try {
   await mkdir(newProjectPath)
-  createDirectoryContents(templatePath, newProjectPath)
+  await createDirectoryContents(templatePath, newProjectPath)
+  console.log(`\nScaffolding project in ${newProjectPath}`)
+  console.log(`\nDone. Now run:\n`)
+  console.log(` cd ${projectName}\n pnpm install\n`)
 } catch (err) {
   console.log(err.message)
 }
