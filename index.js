@@ -27,8 +27,7 @@ const questions = [
     message: 'Project name:',
     validate: (input) => {
       if (/^([A-Za-z-_\d])+$/.test(input)) return true
-      else
-        return 'Project name may only include letters, numbers, underscores and hashes.'
+      return 'Project name may only include letters, numbers, underscores and hashes.'
     },
   },
 ]
@@ -43,7 +42,7 @@ try {
   await mkdir(newProjectPath)
   await createDirectoryContents(templatePath, newProjectPath)
   console.log(`\nScaffolding project in ${newProjectPath}`)
-  console.log(`\nDone. Now run:\n`)
+  console.log('\nDone. Now run:\n')
   console.log(` cd ${projectName}\n pnpm install\n`)
 } catch (err) {
   console.log(err.message)
